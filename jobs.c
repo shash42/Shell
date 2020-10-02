@@ -20,7 +20,7 @@ void insertJob(int i, int pid, char *jobname){
     bg_pending++;
 }
 
-void jobs(int num_args, char **args){
+int jobs(int num_args, char **args){
     /*if(num_args>1){
         fprintf(stderr, "shash: jobs: incorrect number of arguments, 0 required\n");
         return;
@@ -40,18 +40,19 @@ void jobs(int num_args, char **args){
         printf("[%d] %s %s [%d]\n", i+1, status, bg_jobs_name[i], bg_jobs_pid[i]);
         free(statline);
     }
+    return 0;
 }
 
-void kjob(int num_args, char **args){
+int kjob(int num_args, char **args){
     //Initial processing of args
     if(num_args!=3){
         fprintf(stderr, "shash: kjob: incorrect number of arguments. Usage: kjob <job number> <signal number>\n");
-        return;
+        return 1;
     }
     int pididx = atoi(args[1]);
     if(pididx > bg_pending || pididx<=0){
         fprintf(stderr, "shash: kjob: invalid process number specified, 1 to %d active\n", bg_pending);
-        return;
+        return 1;
     }
     int pid = bg_jobs_pid[pididx-1];
 
@@ -59,25 +60,28 @@ void kjob(int num_args, char **args){
     int ret = kill(pid, atoi(args[2]));
     if(ret < 0){
         perror("shash: kjob");
+        return 1;
     }
+    return 0;
 }
 
-void overkill(int num_args, char **args){
+int overkill(int num_args, char **args){
     for(int i = 0; i < bg_pending; i++){
         kill(bg_jobs_pid[i], SIGKILL); //murder!
     }
+    return 0;
 }
 
-void bg(int num_args, char **args){
+int bg(int num_args, char **args){
     //Initial processing of args
     if(num_args!=2){
         fprintf(stderr, "shash: bg: incorrect number of arguments. Usage: bg <job number>\n");
-        return;
+        return 1;
     }
     int pididx = atoi(args[1]);
     if(pididx > bg_pending || pididx<=0){
         fprintf(stderr, "shash: bg: invalid process number specified, 1 to %d active\n", bg_pending);
-        return;
+        return 1;
     }
     int pid = bg_jobs_pid[pididx-1];
 
@@ -85,19 +89,21 @@ void bg(int num_args, char **args){
     int ret = kill(pid, SIGCONT);
     if(ret < 0){
         perror("shash: bg");
+        return 1;
     }   
+    return 0;
 }
 
-void fg(int num_args, char **args){
+int fg(int num_args, char **args){
     //Initial processing of args
     if(num_args!=2){
         fprintf(stderr, "shash: fg: incorrect number of arguments. Usage: fg <job number>\n");
-        return;
+        return 1;
     }
     int pididx = atoi(args[1]);
     if(pididx > bg_pending || pididx<=0){
         fprintf(stderr, "shash: fg: invalid process number specified, 1 to %d active\n", bg_pending);
-        return;
+        return 1;
     }
     int pid = bg_jobs_pid[pididx-1];
 
@@ -124,4 +130,9 @@ void fg(int num_args, char **args){
 		insertJob(pididx-1, pid, savename);
 	}
     free(savename);
+
+    if(status > 0){
+        return 1;
+    }
+    return 0;
 }

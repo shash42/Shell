@@ -66,14 +66,16 @@ char *getRootDir(char *inppath){
 }
 
 //Change directory
-void cd(int num_args, char **args){
+int cd(int num_args, char **args){
     if(num_args > 2){
         printf("shash: cd: too many arguments\n");
+        return 1;
     }
 
     else if(num_args==1){
         if(chdir(home) < 0){
             perror("shash: cd");
+            return 1;
         }
         else{
             //incase needed before next command's tokenizatoin begins (eg: piping) 
@@ -90,6 +92,7 @@ void cd(int num_args, char **args){
         }
         else if(chdir(lwd) < 0){
             perror("shash: cd");
+            return 1;
         }
         else{
             printf("%s\n", lwd);
@@ -102,6 +105,7 @@ void cd(int num_args, char **args){
         char *reqd_path = getRootDir(args[1]);
         if(chdir(reqd_path) < 0){
             perror("shash: cd");
+            return 1;
         }
         else{
             strcpy(lwd, cwd);
@@ -109,9 +113,11 @@ void cd(int num_args, char **args){
         }
         free(reqd_path);
     }
+    return 0;
 }
 
 //Print present working directory
-void pwd(int num_args, char **args){
+int pwd(int num_args, char **args){
     printf("%s\n", cwd);
+    return 0;
 }

@@ -56,7 +56,7 @@ void logHistory(char *toadd){
 }
 
 //implementation of history command
-void history(int num_args, char **args){
+int history(int num_args, char **args){
     getHistory();
     int req = HIST_DEF;
     if(num_args == 2){ //no. of commands required
@@ -65,11 +65,12 @@ void history(int num_args, char **args){
     }
     else if(num_args > 2){
         fprintf(stderr, "shash: history: too many arguments");
-        return;
+        return 1;
     }
     if(req > num_hist) req = num_hist; //if more commands required than available, only show available
     //fprintf(stderr, "here%d", req);
     for(int i = num_hist - req; i < num_hist; i++){
         printf("%s", hist_list[i]);
     }
+    return 0;
 }

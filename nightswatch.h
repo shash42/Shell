@@ -4,8 +4,8 @@
 #include "headers.h"
 #include "directory.h"
 
-void nightswatch(int num_args, char **args);
-void interrupt();
-void newborn();
+int nightswatch(int num_args, char **args);
+int interrupt();
+int newborn();
 
 #endif

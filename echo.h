@@ -3,6 +3,6 @@
 
 #include "headers.h"
 
-void echo(int num_args, char **args);
+int echo(int num_args, char **args);
 
 #endif

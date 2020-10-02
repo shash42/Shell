@@ -8,6 +8,6 @@ int num_hist;
 void getHistory();
 void writeHistory();
 void logHistory(char *toadd);
-void history(int num_args, char **args);
+int history(int num_args, char **args);
 
 #endif

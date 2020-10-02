@@ -7,7 +7,7 @@ int hide_filter(const struct dirent *entry)
 }
 
 //Printing -l output
-void lslong(char *actpath, char *actname){
+int lslong(char *actpath, char *actname){
     //Fix path for stat
     char *path = (char *)malloc(sizeof(char) * PATH_MAX);
     path[0] = '\0';
@@ -18,7 +18,7 @@ void lslong(char *actpath, char *actname){
     struct stat st;
     if(stat(path, &st) < 0){
         perror("shash: ls");
-        return;
+        return 1;
     }
 
     int perms[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP,
@@ -49,10 +49,11 @@ void lslong(char *actpath, char *actname){
     //Free
     free(modtime);
     free(path);
+    return 0;
 }
 
 //do ls for a particular folder
-void execls(char *dirpath, int aflag, int lflag){
+int execls(char *dirpath, int aflag, int lflag){
     char *actpath = getRootDir(dirpath);
     struct dirent** scandir_ret;
     int n;
@@ -62,24 +63,25 @@ void execls(char *dirpath, int aflag, int lflag){
     else n = scandir(actpath, &scandir_ret, NULL, alphasort);
     if (n == -1) {
         perror("shash: scandir");
-        return;
+        return 1;
     }
-
+    int ret = 0;
     //handle l flag and print
     for(int i = 0; i < n; i++)
     {
         if(lflag==0) printf("%s\n", scandir_ret[i]->d_name);
-        else lslong(actpath, scandir_ret[i]->d_name);
+        else ret = lslong(actpath, scandir_ret[i]->d_name);
         free(scandir_ret[i]);
     }
     free(scandir_ret);
+    return ret;
 }
 
 //ls command implementation 
-void ls(int num_args, char **args){
+int ls(int num_args, char **args){
     extern char *optarg;
 	extern int optind;
-    optind = 1;
+    optind = 0;
 	int c; 
 	int aflag=0, lflag=0;
 
@@ -92,16 +94,17 @@ void ls(int num_args, char **args){
 		case 'l':
 			lflag = 1;
 			break;
-		case '?':
+		default:
 			break;
 		}
     }
 
+    int ret = 0;
     //Check if there are any non-flag options (like paths)
     int num_dir = num_args - optind;
     if(num_dir==0){
-        execls(cwd, aflag, lflag); //if no flag, ls on cwd.
-        return;
+        ret = execls(cwd, aflag, lflag); //if no flag, ls on cwd.
+        return ret;
     }
     for(int i = optind; i < num_args; i++){ //else ls on every path provided
         if(i > optind){
@@ -110,6 +113,7 @@ void ls(int num_args, char **args){
         if(num_dir > 1){
             printf("%s:\n", args[i]);
         }
-        execls(args[i], aflag, lflag);
+        ret |= execls(args[i], aflag, lflag);
     }
+    return ret;
 }

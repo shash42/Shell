@@ -1,11 +1,12 @@
 #include "pinfo.h"
 
 //Implements the pinfo command as required
-void pinfo(int num_args, char **args){
+int pinfo(int num_args, char **args){
     char prefix[30], path[PATH_MAX];
     int pid = getpid();
     if(num_args>2){
         fprintf(stderr, "shash: pinfo: too many arguments\n");
+        return 1;
     }
     else if(num_args==2){ //for a particular pid
         pid = atoi(args[1]);
@@ -21,7 +22,7 @@ void pinfo(int num_args, char **args){
     strcat(path, "status");
     if(access(path, R_OK) == -1){
         fprintf(stderr, "shash: pinfo: (%d) - No such process\n", pid);
-        return;
+        return 1;
     }
 
     //extract the information required from proc/pid/status
@@ -44,4 +45,5 @@ void pinfo(int num_args, char **args){
     printf("Virtual Memory -- %s\nExecutable path -- %s\n", minfo, exec_path);
 
     free(mem); free(status);
+    return 0;
 }

@@ -29,5 +29,12 @@ void printPrompt(){
     char *shell_dir = getShellDir(cwd);
     strcpy(dir_name, shell_dir);
     free(shell_dir);
-    printf("%s@%s:%s$ ", user_name, sys_name, dir_name);
+    char exit_emoji[5];
+    if(last_exit > 0){
+        strcpy(exit_emoji, ":\'(");
+    }
+    else {
+        strcpy(exit_emoji, ":\')");
+    }
+    printf("\x1b[32m" "%s%s@%s:" "\x1b[34m" "%s$ " "\x1b[0m", exit_emoji, user_name, sys_name, dir_name);
 }

@@ -1,8 +1,8 @@
-<h1> shash </h1>
+<h1> shash again shell </h1>
 
 <h3> Introduction </h3>
 
-Presenting shash's shell - a Linux styled shell written in C  <br>
+Presenting shash again shell (shash) - a Linux styled shell written in C  <br>
 
 <h3> How to use </h3>
 
@@ -25,32 +25,40 @@ Presenting shash's shell - a Linux styled shell written in C  <br>
     <li> <code>run.c and run.h </code> - Implements foreground/background handling and execution of external commands </li>
     <li> <code>pinfo.c and pinfo.h</code> - Implements pinfo </li>
     <li> <code>nightswatch.c and nightswatch.h</code> - Implements nightswatch</li>
+    <li> <code>env.c and env.h</code> - Implements setting and unsetting environment variables </li>
+    <li> <code>jobs.c and jobs.h</code> - Implements job handling, including jobs kjob, overkill, bg, and fg </li>
 </ol>
+
 
 <h4> Extra Features </h4>
 
 <ol>
+    <li> Name is a recursive acronym (Notice this senpai). Gödel, Escher, Bach is life. </li>
     <li> Getopt has been used to ensure proper argument handling </li>
-    <li> Generalized signal handler based on signalTransfer for ease-of-extension in Assignment 3</li>
-    <li> Fancier stuff not in requirements like colours, usage messages, arrow-key handling etc. will be coded as part of Assignment 3.</li>
+    <li> Generalized signal handler based on signalTransfer </li>
+    <li> Usage messages are printed for custom commands </li>
+    <li> Colors! Try running quit for an "easter-egg" :P </li>
 </ol>
-
 
 <h3> Assumptions </h3>
 
-Apart from the requirements in the Assignment pdf, clarifications on moodle, and conforming to shell behaviour, the following assumptions were made:
+Apart from the requirements in the Assignment 2, 3 pdf, clarifications on moodle, and conforming to shell behaviour, the following assumptions were made:
 
 <h4> System Requirements </h4>
 
 <ol>
     <li> The code has not been tested on Mac, WSL etc. While it should work on most POSIX environments, it has only been tested in Ubuntu 20. </li>
+    <li> getopt can give 'invalid option' on some systems for options not even in input. It works on my system so I did not have an easy way to figure out why this happens and fix it. Can run these commands through screen-share for testing. </li>
 </ol>
 <h4> Assignment Requirements</h4>
 
 <ol>
-    <li> cd - executed twice back to back takes us back to the original directory and not the second last directory, i.e. we don't have to maintain the complete history of working directories. Moreover, if a change of directory fails, we don't have to change the last working directory</li>
+    <li> If a change of directory fails, we don't have to change the last working directory. </li>
     <li> Features of redirection like specifying particular file descriptors to be redirected in the command itself are not required, as they haven't been mentioned. Similarly, for other commands too, features / flags not asked explicitly have not been implemented. </li>
+    <li> Files with commands when redirected to the shell will not have trailing lines, otherwise the trailing lines will be executed as empty commands (basically extra prompts will be printed) </li>
+    <li> Parse errors that are not critical (eg: ls -a -f can be interpreted as ls -a and run, while outputting -f is not a valid flag) will not send non-zero exit codes. The next prompt in this case is printed with :') </li>
 </ol>
+
 
 
 <h4> Input Restrictions </h4>
@@ -65,12 +73,10 @@ Apart from the requirements in the Assignment pdf, clarifications on moodle, and
 <li> An error has to be thrown on incorrect no. of arguments for kjob, bg, fg too. </li>
 </ol>
 
-
-
 <h4> Process Management </h4>
 
 <ol> 
     <li> Some background processes (like ps) give output on the terminal, and the prompt is not shown after these in bash. The same behaviour has been followed. </li>
-    <li> The implementation of pinfo requires a certain format of proc/pid/status and proc/pid/exe which may not be available in every distribution. </li>
+    <li> The implementation of pinfo requires a certain format of proc/pid/status and proc/pid/exe which may not be available/in the same format in every distribution. </li>
     <li> It is assumed that when the shell is closed, background processes have to be terminated (not normally) too. It is upto the background process to print any relevant information. Vim catches HUP, hopefully other processes you try will too :) </li>
 </ol>

@@ -5,8 +5,8 @@
 #include "directory.h"
 
 int hide_filter(const struct dirent *entry);
-void lslong(char *actpath, char *actname);
-void execls(char *dirpath, int aflag, int lflag);
-void ls(int num_args, char **args);
+int lslong(char *actpath, char *actname);
+int execls(char *dirpath, int aflag, int lflag);
+int ls(int num_args, char **args);
 
 #endif

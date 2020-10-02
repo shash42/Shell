@@ -4,6 +4,6 @@
 #include "headers.h"
 #include "directory.h"
 
-void pinfo(int num_args, char **args);
+int pinfo(int num_args, char **args);
 
 #endif

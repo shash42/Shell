@@ -16,7 +16,7 @@ char *getInput(){
     char *line = NULL;
     int ret = getline(&line, &inp_len, stdin);
     if(ret==-1){
-        printf("exit\n");
+        printf("\r\n");
         exit(0);
     }
     return line;
@@ -37,7 +37,7 @@ int hasPipes(char *line){
     return cnt;
 }
 
-int Piping(char *line);
+void Piping(char *line);
 
 void commander(char *line){
     //printf("this %s\n", line);
@@ -74,6 +74,7 @@ void commander(char *line){
             if(fd_out < 0){
                 perror("shash: Output Redirection");
                 commanderexit(args, num_args);
+                last_exit = 1;
                 return;
             }
             close(fd_out);
@@ -90,6 +91,7 @@ void commander(char *line){
             if(fd_in < 0){
                 perror("shash: Input Redirection");
                 commanderexit(args, num_args);
+                last_exit = 1;
                 return;
             }
             close(fd_in);
@@ -108,6 +110,7 @@ void commander(char *line){
     free(cmd);
     if(num_args<1){ //handle commands that only have spaces lol
         commanderexit(args, num_args);
+        last_exit = 0;
         return;
     }
     //handle background job input
@@ -131,6 +134,7 @@ void commander(char *line){
         if (newfdin < 0){
             iserr = 1;
             perror("shash: Input Redirection");
+            last_exit = 1;
         }
         else dup2(newfdin, STDIN_FILENO);
     }
@@ -144,6 +148,7 @@ void commander(char *line){
         if(newfdout < 0){
             iserr = 1;
             perror("shash: Output Redirection");
+            last_exit = 1;
         }
         else dup2(newfdout, STDOUT_FILENO);
     }
@@ -156,70 +161,70 @@ void commander(char *line){
     if(strcmp(args[0], "exit")==0) exit(0);
 
     else if(strcmp(args[0], "cd")==0){
-        cd(num_args, args);
+        last_exit = cd(num_args, args);
     }
 
     else if(strcmp(args[0], "pwd")==0){
-        pwd(num_args, args);
+        last_exit = pwd(num_args, args);
     }
 
     else if(strcmp(args[0], "echo")==0){
-        echo(num_args, args);
+        last_exit = echo(num_args, args);
     }
 
     else if(strcmp(args[0], "ls")==0){
-        ls(num_args, args);
+        last_exit = ls(num_args, args);
     }
 
     else if(strcmp(args[0], "pinfo")==0){
-        pinfo(num_args, args);
+        last_exit = pinfo(num_args, args);
     }
 
     else if(strcmp(args[0], "history")==0){
-        history(num_args, args);
+        last_exit = history(num_args, args);
     }
 
     else if(strcmp(args[0], "nightswatch")==0){
-        nightswatch(num_args, args);
+        last_exit = nightswatch(num_args, args);
     }
 
     else if(strcmp(args[0], "setenv")==0){
-        mysetenv(num_args, args);
+        last_exit = mysetenv(num_args, args);
     }
 
     else if(strcmp(args[0], "unsetenv")==0){
-        myunsetenv(num_args, args);
+        last_exit = myunsetenv(num_args, args);
     }
 
     else if(strcmp(args[0], "jobs")==0){
-        jobs(num_args, args);
+        last_exit = jobs(num_args, args);
     }
 
     else if(strcmp(args[0], "kjob")==0){
-        kjob(num_args, args);
+        last_exit = kjob(num_args, args);
     }
     
     else if(strcmp(args[0], "overkill")==0){
-        overkill(num_args, args);
+        last_exit = overkill(num_args, args);
     }
 
     else if(strcmp(args[0], "quit")==0){
-        printf("shash: Imma head out /;-;/\n");
-        overkill(num_args, args);
+        printf("\x1b[31m" "shash: Imma head out" "\x1b[33m" "\x1b[33m" "/;-;/\n");
+        last_exit = overkill(num_args, args);
         commanderexit(args, num_args);
         exit(0);
     }
 
     else if(strcmp(args[0], "bg")==0){
-        bg(num_args, args);
+        last_exit = bg(num_args, args);
     }
 
     else if(strcmp(args[0], "fg")==0){
-        fg(num_args, args);
+        last_exit = fg(num_args, args);
     }
     
     else{
-        extrun(num_args, args, isbg);
+        last_exit = extrun(num_args, args, isbg);
     }   
 
     //Terminating Redirection
@@ -240,6 +245,7 @@ void shell(){
         getcwd(cwd, PATH_MAX + 2);
         printPrompt();
         char *longline = getInput();
+        last_exit = 0;
         logHistory(longline);
         
         //Token on ; and \n to get indiv commands
@@ -262,13 +268,13 @@ signed main(){
     signal(SIGTSTP, SIG_IGN); //ctrl Z ignored by terminal
     getcwd(home, PATH_MAX + 2);
     strcpy(lwd, "\0");
-    bg_pending = 0;
+    bg_pending = last_exit = 0;
     //printf("%s\n", home_dir);
     
     shell();
 }
 
-int Piping(char *line){
+void Piping(char *line){ //expected to set last_exit status internally, return value doesnt matter
     char *curr = (char *)malloc(LINE_LEN_MAX);
     char *next = (char *)malloc(LINE_LEN_MAX);
     int pipefd[2], fdprvout = STDIN_FILENO;
@@ -280,13 +286,15 @@ int Piping(char *line){
         int ret = pipe(pipefd);
         if(ret < 0){
             perror("shash: Piping");
-            return -1;
+            last_exit = 1;
+            return;
         }
 
         pid_t pid = fork();
         if(pid < 0){
             perror("shash: Piping pid < 0");
-            return -1;
+            last_exit = 1;
+            return;
         }
         if(pid == 0){ //child
             close(pipefd[0]);
@@ -295,16 +303,23 @@ int Piping(char *line){
                 dup2(pipefd[1], STDOUT_FILENO); //all output to pipe-writeend (otherwise to stdout)
             }
             close(pipefd[1]); //closing the FD, not the file (stored in STDOUT now)
+            last_exit = 0;
             commander(curr); //run the current command
-            exit(2);
+            if(last_exit > 0) exit(2);
+            else exit(0);
         }
         else{ //parent
-            wait(NULL); //wait for child to end
+            int status = 0;
+            wait(&status); //wait for child to end
             close(pipefd[1]);
             fdprvout = pipefd[0]; //fdprvout now points to output of previous
+            if(status > 0)  {
+                last_exit = 1;
+                //printf("voila!%d\n", status);
+            }
+            else last_exit = 0;
         }
     }
     close(fdprvout);   
     free(curr); free(next);
-    return 0;
 }

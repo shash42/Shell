@@ -1,6 +1,6 @@
 #include "echo.h"
 
-void echo(int num_args, char **args){
+int echo(int num_args, char **args){
     char *output = (char *)malloc(ECHO_LEN_MAX);
     char *addspace = " ";
     output[0] = '\0';
@@ -13,4 +13,5 @@ void echo(int num_args, char **args){
     }
     printf("%s\n", output);
     //free(output);
+    return 0;
 }

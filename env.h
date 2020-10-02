@@ -2,7 +2,7 @@
 #define __ENV_H
 #include "headers.h"
 
-void mysetenv(int num_args, char **args);
-void myunsetenv(int num_args, char **args);
+int mysetenv(int num_args, char **args);
+int myunsetenv(int num_args, char **args);
 
 #endif

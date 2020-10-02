@@ -46,14 +46,14 @@ void handleZombies() {
     signalTransfer(SIGCHLD, childOut);
 } 
 
-void extrun(int num_args, char **args, int isbg){
+int extrun(int num_args, char **args, int isbg){
     handleZombies();
     
     //https://www.gnu.org/software/libc/manual/html_node/Launching-Jobs.html
     pid_t pid = fork();
     if(pid < 0){
         perror("shash: Couldn't fork");
-        return;
+        return 1; //send error exit code
     }   
     //child
     else if(pid==0){
@@ -96,6 +96,10 @@ void extrun(int num_args, char **args, int isbg){
                 printf("%s with pid %d suspended\n", args[0], pid);
                 insertJob(bg_pending, pid, args[0]);
             }
+            if(status>0){
+                return 1;
+            }
         }
     }
+    return 0;
 }
