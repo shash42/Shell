@@ -28,7 +28,7 @@
 #define HIST_LIM 20
 #define HIST_DEF 10
 
-char home[PATH_MAX + 2], cwd[PATH_MAX+2];
+char home[PATH_MAX + 2], cwd[PATH_MAX+2], lwd[PATH_MAX+2];
 char bg_jobs_name[BG_JOBS_MAX][ARG_LEN_MAX];
 pid_t bg_jobs_pid[BG_JOBS_MAX];
 int bg_pending;

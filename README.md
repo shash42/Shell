@@ -45,6 +45,13 @@ Apart from the requirements in the Assignment pdf, clarifications on moodle, and
 <ol>
     <li> The code has not been tested on Mac, WSL etc. While it should work on most POSIX environments, it has only been tested in Ubuntu 20. </li>
 </ol>
+<h4> Assignment Requirements</h4>
+
+<ol>
+    <li> cd - executed twice back to back takes us back to the original directory and not the second last directory, i.e. we don't have to maintain the complete history of working directories. Moreover, if a change of directory fails, we don't have to change the last working directory</li>
+    <li> Features of redirection like specifying particular file descriptors to be redirected in the command itself are not required, as they haven't been mentioned. Similarly, for other commands too, features / flags not asked explicitly have not been implemented. </li>
+</ol>
+
 
 <h4> Input Restrictions </h4>
 
@@ -55,8 +62,9 @@ Apart from the requirements in the Assignment pdf, clarifications on moodle, and
 <li> Error handling is not extremely rigorous for now, so in some cases missing permissions, changing behavior of certain files while execution etc. will lead to uncatched errors. </li>
 <li>Nightswatch terminates on entering q and pressing enter</li>
 <li>Multiple consecutive pipes don't work, i.e. ls||sort or ls | | sort etc. as the characters between them are themselves parsed as a command. Piping won't be provided for background processes. </li>
-<li> An error has to be thrown on incorrect no. of arguments for kjob, bg too. </li>
+<li> An error has to be thrown on incorrect no. of arguments for kjob, bg, fg too. </li>
 </ol>
+
 
 
 <h4> Process Management </h4>

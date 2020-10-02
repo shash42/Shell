@@ -261,6 +261,7 @@ signed main(){
     signal(SIGINT, SIG_IGN); //ctrl C ignored by terminal
     signal(SIGTSTP, SIG_IGN); //ctrl Z ignored by terminal
     getcwd(home, PATH_MAX + 2);
+    strcpy(lwd, "\0");
     bg_pending = 0;
     //printf("%s\n", home_dir);
     

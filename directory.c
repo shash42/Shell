@@ -77,16 +77,34 @@ void cd(int num_args, char **args){
         }
         else{
             //incase needed before next command's tokenizatoin begins (eg: piping) 
+            strcpy(lwd, cwd);
             getcwd(cwd, PATH_MAX + 2);
         }
     }
     
+    else if(strcmp(args[1], "-")==0){
+        char temp[PATH_MAX];
+        strcpy(temp, cwd);
+        if(strlen(lwd)==0){
+            printf("%s\n", cwd);
+        }
+        else if(chdir(lwd) < 0){
+            perror("shash: cd");
+        }
+        else{
+            printf("%s\n", lwd);
+            strcpy(lwd, cwd);
+            getcwd(cwd, PATH_MAX + 2);
+        }
+    }
+
     else{ //move to root directory
         char *reqd_path = getRootDir(args[1]);
         if(chdir(reqd_path) < 0){
             perror("shash: cd");
         }
         else{
+            strcpy(lwd, cwd);
             getcwd(cwd, PATH_MAX + 2);
         }
         free(reqd_path);

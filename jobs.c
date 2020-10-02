@@ -118,7 +118,7 @@ void fg(int num_args, char **args){
     tcsetpgrp(STDIN_FILENO, getpgrp());
     signal(SIGTTIN, SIG_DFL);   signal(SIGTTOU, SIG_DFL);
 
-    if(WIFSTOPPED(status))
+    if(WIFSTOPPED(status)) //handle ctrl+Z
 	{
 		printf("%s with pid %d suspended\n", savename, pid);
 		insertJob(pididx-1, pid, savename);
